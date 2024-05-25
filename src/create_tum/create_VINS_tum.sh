@@ -10,6 +10,7 @@ arg_flag=$1
 # -r = resolution
 # -wn_acc = noise withe imu
 # -wn_gyr = noise withe imu
+# -fi = frequence imu
 
 
 if [ $# -eq 0 ] # not arg
@@ -19,6 +20,7 @@ then
     echo "      -r       resolution"
     echo "      -wn_acc  withe noise accelerometer imu"
     echo "      -wn_gyr  withe noise gyroscope imu"
+    echo "      -fi      frequence imu"
     exit
 fi  
 
@@ -32,10 +34,20 @@ then
     echo -e "${GREEN}LOG_BASH:${NORMAL} Run type ${YELLOW} resolution ${NORMAL}"
 fi  
 
-if [ $arg_flag = "-wn_acc" ] # noise image
+if [ $arg_flag = "-wn_acc" ] # noise  accelerometer imu
 then
     echo -e "${GREEN}LOG_BASH:${NORMAL} Run type ${YELLOW} wnoise acc imu ${NORMAL}"
 fi  
+
+if [ $arg_flag = "-wn_gyr" ] # withe noise gyroscope imu
+then
+    echo -e "${GREEN}LOG_BASH:${NORMAL} Run type ${YELLOW} wnoise gyr imu ${NORMAL}"
+fi 
+
+if [ $arg_flag = "-fi" ] # withe noise gyroscope imu
+then
+    echo -e "${GREEN}LOG_BASH:${NORMAL} Run type ${YELLOW} freq imu ${NORMAL}"
+fi 
 
 res_str=(
     "432x677"
@@ -52,7 +64,19 @@ wnoise_sigma_acc=(
     3.2
 )
 
+wnoise_sigma_gyr=(
+    0.02
+    0.04
+    0.08
+    0.16
+    0.32
+)
 
+freq_imu=(
+    100
+    50
+    25
+)
 
 bagnames=(
   #"V1_01_easy"
@@ -91,7 +115,7 @@ function run {
     rosrun loop_fusion loop_fusion_node $path_config > /dev/null 2>&1 &   
     echo -e "${GREEN}LOG_BASH:${NORMAL} run VINS"
 
-    /mnt/d/Work/Diplom/src/create_tum/sub.py $path_out   &  
+    /mnt/d/Work/Diplom/model_data_for_VINS/src/create_tum/sub.py $path_out   &  
     echo -e "${GREEN}LOG_BASH:${NORMAL} run sub.py"
 
     echo -e "${GREEN}LOG_BASH:${NORMAL} run rosbag"
@@ -115,8 +139,8 @@ bag_name="V1_01_easy" #_short
     if [ $arg_flag = "-o" ] # original
     then
         echo -e "${GREEN}LOG_BASH:${NORMAL} start ${YELLOW} $bag_name ${NORMAL}"
-        path_bag="/mnt/d/Work/Diplom/Dataset_EuRoC/original/${bag_name}/${bag_name}.bag"
-        path_out="/mnt/d/Work/Diplom/Dataset_EuRoC/original/${bag_name}/original.tum"
+        path_bag="/mnt/d/Work/Diplom/model_data_for_VINS/Dataset_EuRoC/original/${bag_name}/${bag_name}.bag"
+        path_out="/mnt/d/Work/Diplom/model_data_for_VINS/Dataset_EuRoC/original/${bag_name}/original.tum"
         path_config=~/catkin_ws/src/VINS-Fusion/config/euroc/euroc_stereo_imu_config.yaml  # БЕЗ КАВЫЧЕК !!!
         run $path_bag $path_out $path_config
     fi  
@@ -127,26 +151,47 @@ bag_name="V1_01_easy" #_short
         for ((i=0; i < 4; i++)) 
         do 
             echo -e "${GREEN}LOG_BASH:${NORMAL} start ${YELLOW} $bag_name res_${res_str[$i]}${NORMAL}"
-            path_bag="/mnt/d/Work/Diplom/Dataset_EuRoC/resolution/${bag_name}/res_${res_str[$i]}/${bag_name}.bag"
-            path_out="/mnt/d/Work/Diplom/Dataset_EuRoC/resolution/${bag_name}/res_${res_str[$i]}/${res_str[$i]}.tum"
+            path_bag="/mnt/d/Work/Diplom/model_data_for_VINS/Dataset_EuRoC/resolution/${bag_name}/res_${res_str[$i]}/${bag_name}.bag"
+            path_out="/mnt/d/Work/Diplom/model_data_for_VINS/Dataset_EuRoC/resolution/${bag_name}/res_${res_str[$i]}/${res_str[$i]}.tum"
             path_config=~/catkin_ws/src/VINS-Fusion/config/euroc/resolution/res_${res_str[$i]}/euroc_stereo_imu_config.yaml # БЕЗ КАВЫЧЕК !!!
             run $path_bag $path_out $path_config
         done
     fi  
 
-
-    if [ $arg_flag = "-wn_acc" ] # noise image
+    if [ $arg_flag = "-wn_acc" ] 
     then
-        #for ((i=0; i < 5; i++)) 
-        #do 
-            i=3
-            sigma=${wnoise_sigma_acc[$i]}
+        for sigma in ${wnoise_sigma_acc[@]}
+        do   
             echo -e "${GREEN}LOG_BASH:${NORMAL} start ${YELLOW} $bag_name sigma_acc_${sigma}"
-            path_bag="/mnt/d/Work/Diplom/Dataset_EuRoC/wnoise_imu_acc/${bag_name}/sigma_${sigma}/${bag_name}.bag"
-            path_out="/mnt/d/Work/Diplom/Dataset_EuRoC/wnoise_imu_acc/${bag_name}/sigma_${sigma}/sigma_${sigma}.tum"
+            path_bag="/mnt/d/Work/Diplom/model_data_for_VINS/Dataset_EuRoC/wnoise_imu_acc/${bag_name}/sigma_${sigma}/${bag_name}.bag"
+            path_out="/mnt/d/Work/Diplom/model_data_for_VINS/Dataset_EuRoC/wnoise_imu_acc/${bag_name}/sigma_${sigma}/sigma_${sigma}.tum"
             path_config=~/catkin_ws/src/VINS-Fusion/config/euroc/wnoise_imu_acc/sigma_${sigma}/euroc_stereo_imu_config.yaml  # БЕЗ КАВЫЧЕК !!!
             run $path_bag $path_out $path_config
-        #done
+        done
+    fi  
+
+    if [ $arg_flag = "-wn_gyr" ]
+    then
+        for sigma in ${wnoise_sigma_gyr[@]}
+        do  
+            echo -e "${GREEN}LOG_BASH:${NORMAL} start ${YELLOW} $bag_name sigma_gyr_${sigma}"
+            path_bag="/mnt/d/Work/Diplom/model_data_for_VINS/Dataset_EuRoC/wnoise_imu_gyr/${bag_name}/sigma_${sigma}/${bag_name}.bag"
+            path_out="/mnt/d/Work/Diplom/model_data_for_VINS/Dataset_EuRoC/wnoise_imu_gyr/${bag_name}/sigma_${sigma}/sigma_${sigma}.tum"
+            path_config=~/catkin_ws/src/VINS-Fusion/config/euroc/wnoise_imu_gyr/sigma_${sigma}/euroc_stereo_imu_config.yaml  # БЕЗ КАВЫЧЕК !!!
+            run $path_bag $path_out $path_config
+        done
+    fi 
+
+    if [ $arg_flag = "-fi" ] # freq imu
+    then
+        for f in ${freq_imu[@]}
+        do 
+            echo -e "${GREEN}LOG_BASH:${NORMAL} start ${YELLOW} $bag_name imu_freq_${f}"
+            path_bag="/mnt/d/Work/Diplom/model_data_for_VINS/Dataset_EuRoC/imu_freq/${bag_name}/imu_freq_${f}Hz/${bag_name}.bag"
+            path_out="/mnt/d/Work/Diplom/model_data_for_VINS/Dataset_EuRoC/imu_freq/${bag_name}/imu_freq_${f}Hz/imu_freq_${f}Hz.tum"
+            path_config=~/catkin_ws/src/VINS-Fusion/config/euroc/euroc_stereo_imu_config.yaml  # БЕЗ КАВЫЧЕК !!!
+            run $path_bag $path_out $path_config
+        done
     fi  
     
 #done
