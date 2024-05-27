@@ -1,5 +1,5 @@
 #!/bin/bash
-video=V1_01_easy
+video=V2_03_difficult
 
 wnoise_sigma_gyr=(
     0.02

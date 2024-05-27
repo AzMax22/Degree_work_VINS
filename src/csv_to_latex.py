@@ -1,6 +1,6 @@
 import csv
 
-path_table = "/mnt/d/Work/Diplom/Dataset_EuRoC/wnoise_imu_acc/V1_01_easy/results/table.cvs"
+path_table = "/mnt/d/Work/Diplom/model_data_for_VINS/Dataset_EuRoC/wnoise_imu_gyr/V2_03_difficult/results/table.csv"
 
 pre_table="\
 \\begin{table}[!ht] \n \

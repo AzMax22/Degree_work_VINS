@@ -1,5 +1,5 @@
 #!/bin/bash
-video=V2_01_easy
+video=$1
 
 wnoise_sigma_acc=(
     0.2

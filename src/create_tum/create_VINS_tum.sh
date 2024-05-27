@@ -82,10 +82,10 @@ bagnames=(
   #"V1_01_easy"
   #"V1_02_medium"
   #"V1_03_difficult"
-  #"V2_01_easy"
-  #"V2_02_medium"
-  #"V2_03_difficult"
-  "MH_01_easy"
+  "V2_01_easy"
+  "V2_02_medium"
+  "V2_03_difficult"
+  #"MH_01_easy"
   #"MH_02_easy"
   #"MH_03_medium"
   #"MH_04_difficult"
@@ -131,10 +131,10 @@ function run {
     echo -e "${GREEN}LOG_BASH:${NORMAL} end"
 }
 
-bag_name="V1_01_easy" #_short
+#bag_name="V1_01_easy" #_short
 
-#for bag_name in ${bagnames[@]}
-#do
+for bag_name in ${bagnames[@]}
+do
 
     if [ $arg_flag = "-o" ] # original
     then
@@ -194,7 +194,7 @@ bag_name="V1_01_easy" #_short
         done
     fi  
     
-#done
+done
 
 
 

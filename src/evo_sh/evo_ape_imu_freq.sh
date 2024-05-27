@@ -1,5 +1,5 @@
 #!/bin/bash
-video=MH_01_easy
+video=$1
 
 freq_imu=(
     25
